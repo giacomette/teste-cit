@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "descricao": "Importação de arquivos de fundos",
+    "dataMaximaExecucao": "2019-11-10 12:00:00",
+    "tempoEstimadoHora": 2
+  },
+  {
+    "id": 2,
+    "descricao": "Importação de dados da Base Legada",
+    "dataMaximaExecucao": "2019-11-11 12:00:00",
+    "tempoEstimadoHora": 4
+  },
+  {
+    "id": 3,
+    "descricao": "Importação de dados de integração",
+    "dataMaximaExecucao": "2019-11-11 08:00:00",
+    "tempoEstimadoHora": 6
+  }
+]
