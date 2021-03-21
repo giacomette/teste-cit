@@ -1,14 +1,25 @@
 export function isAfter(firstDate, secondDate) {
-  let first = firstDate;
-  let second = secondDate;
-
-  if (!(first instanceof Date)) {
-    first = new Date(first);
-  }
-
-  if (!(second instanceof Date)) {
-    second = new Date(second);
-  }
+  const first = getInstanceDate(firstDate);
+  const second = getInstanceDate(secondDate);
 
   return first.getTime() > second.getTime();
+}
+
+export function isBefore(firstDate, secondDate) {
+  const first = getInstanceDate(firstDate);
+  const second = getInstanceDate(secondDate);
+
+  return first.getTime() < second.getTime();
+}
+
+export function getInstanceDate(date) {
+  if (!date) {
+    return null;
+  }
+
+  if (!(date instanceof Date)) {
+    return new Date(date);
+  }
+
+  return date;
 }
