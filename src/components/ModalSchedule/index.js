@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { useCallback, useEffect, useState } from "react";
 
 import Button from "@material-ui/core/Button";
@@ -12,6 +11,8 @@ import { TextField } from "@material-ui/core";
 import Swal from "sweetalert2";
 
 import useExecuteSchedule from "../../actions/useExecuteSchedule";
+import useFormSchedule from "../../actions/useFormSchedule";
+
 import CardJob from "./components/CardJob";
 import ModalJob from "../ModalJob";
 import { ContainerButtonExecute, ContainerResultSchedule } from "./styles";
@@ -23,13 +24,15 @@ function ModalSchedule({ open, value, onCancel, onSave }) {
     handleExecuteSchedule,
   } = useExecuteSchedule();
 
-  const [form, setForm] = useState();
+  const {
+    form,
+    onChange,
+    validateBeforeSave,
+    handleSaveJobs,
+  } = useFormSchedule(value);
+
   const [openModalJob, setOpenModalJob] = useState(false);
   const [job, setJob] = useState();
-
-  useEffect(() => {
-    setForm(value);
-  }, [value]);
 
   useEffect(() => {
     if (!open) {
@@ -42,56 +45,14 @@ function ModalSchedule({ open, value, onCancel, onSave }) {
   }, [onCancel]);
 
   const handleSave = useCallback(() => {
-    if (!form?.title) {
-      return Swal.fire("Aviso", "Informe o titulo do agendamento");
-    }
+    const error = validateBeforeSave();
 
-    if (!form?.start) {
-      return Swal.fire("Aviso", "Informe a data de inicio do agendamento");
-    }
-
-    if (!form?.end) {
-      return Swal.fire("Aviso", "Informe a data de fim do agendamento");
-    }
-
-    if (!form.jobs?.length) {
-      return Swal.fire("Aviso", "Informe pelo menos 1 job para o agendamento");
+    if (error) {
+      return Swal.fire("Aviso", error);
     }
 
     onSave(form);
-  }, [onSave, form]);
-
-  const onChange = useCallback((prop, v) => {
-    setForm((prev) => ({
-      ...prev,
-      [prop]: v,
-    }));
-  }, []);
-
-  const handleSaveJobs = useCallback(
-    (jobSave) => {
-      const jobs = form?.jobs ?? [];
-
-      setOpenModalJob(false);
-      setJob();
-
-      if (!jobSave.id) {
-        onChange("jobs", [...jobs, { id: jobs.length + 1, ...jobSave }]);
-        return;
-      }
-
-      const newJobs = form.jobs.map((item) => {
-        if (item.id === jobSave.id) {
-          return jobSave;
-        }
-
-        return item;
-      });
-
-      onChange("jobs", newJobs);
-    },
-    [form, onChange]
-  );
+  }, [form, onSave, validateBeforeSave]);
 
   const handleAddJob = useCallback(() => {
     setJob();
@@ -113,17 +74,14 @@ function ModalSchedule({ open, value, onCancel, onSave }) {
           setJob();
         }}
         onSave={(jobSave) => {
+          setOpenModalJob(false);
+          setJob();
           handleSaveJobs(jobSave);
         }}
       />
 
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">Agendamento de jobs</DialogTitle>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Agendamento de jobs</DialogTitle>
         <DialogContent>
           <Grid container spacing={3}>
             <Grid item xs={12}>
