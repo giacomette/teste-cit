@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useCallback, useEffect, useState } from "react";
 
 import Button from "@material-ui/core/Button";
@@ -8,11 +9,20 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import FormControl from "@material-ui/core/FormControl";
 import Grid from "@material-ui/core/Grid";
 import { TextField } from "@material-ui/core";
-import CardJob from "./components/CardJob";
-import ModalJob from "../ModalJob";
 import Swal from "sweetalert2";
 
+import useExecuteSchedule from "../../actions/useExecuteSchedule";
+import CardJob from "./components/CardJob";
+import ModalJob from "../ModalJob";
+import { ContainerButtonExecute, ContainerResultSchedule } from "./styles";
+
 function ModalSchedule({ open, value, onCancel, onSave }) {
+  const {
+    listResult,
+    clearResult,
+    handleExecuteSchedule,
+  } = useExecuteSchedule();
+
   const [form, setForm] = useState();
   const [openModalJob, setOpenModalJob] = useState(false);
   const [job, setJob] = useState();
@@ -20,6 +30,12 @@ function ModalSchedule({ open, value, onCancel, onSave }) {
   useEffect(() => {
     setForm(value);
   }, [value]);
+
+  useEffect(() => {
+    if (!open) {
+      clearResult();
+    }
+  }, [open, clearResult]);
 
   const handleClose = useCallback(() => {
     onCancel();
@@ -55,22 +71,24 @@ function ModalSchedule({ open, value, onCancel, onSave }) {
   const handleSaveJobs = useCallback(
     (jobSave) => {
       const jobs = form?.jobs ?? [];
-      if (!jobSave.id) {
-        onChange("jobs", [...jobs, { id: jobs.length + 1, ...jobSave }]);
-      } else {
-        const newJobs = form.jobs.map((item) => {
-          if (item.id === jobSave.id) {
-            return jobSave;
-          }
-
-          return item;
-        });
-
-        onChange("jobs", newJobs);
-      }
 
       setOpenModalJob(false);
       setJob();
+
+      if (!jobSave.id) {
+        onChange("jobs", [...jobs, { id: jobs.length + 1, ...jobSave }]);
+        return;
+      }
+
+      const newJobs = form.jobs.map((item) => {
+        if (item.id === jobSave.id) {
+          return jobSave;
+        }
+
+        return item;
+      });
+
+      onChange("jobs", newJobs);
     },
     [form, onChange]
   );
@@ -181,6 +199,24 @@ function ModalSchedule({ open, value, onCancel, onSave }) {
                 />
               ))}
             </Grid>
+
+            {form?.jobs?.length ? (
+              <ContainerButtonExecute>
+                <Button
+                  onClick={() => handleExecuteSchedule(form)}
+                  color="secondary"
+                  variant="outlined"
+                >
+                  Executar Jobs
+                </Button>
+              </ContainerButtonExecute>
+            ) : null}
+
+            {listResult ? (
+              <ContainerResultSchedule>
+                <pre>{JSON.stringify(listResult)}</pre>
+              </ContainerResultSchedule>
+            ) : null}
           </Grid>
         </DialogContent>
         <DialogActions>
