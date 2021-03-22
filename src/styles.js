@@ -5,6 +5,10 @@ export const GlobalStyle = createGlobalStyle`
     font-family: Roboto, sans-serif;
     background-color: #efefef;
   }
+
+  .swal2-container.swal2-center {
+    z-index: 9999;
+  }
 `;
 
 export const Container = styled.div`

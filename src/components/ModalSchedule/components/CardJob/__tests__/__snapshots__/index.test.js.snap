@@ -1,0 +1,180 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CardJob Deve verificar se houve mudança no card 1`] = `
+Object {
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <div
+        class="sc-bdfBwQ ijWURA"
+      >
+        <div
+          class="MuiPaper-root MuiCard-root MuiPaper-elevation2 MuiPaper-rounded"
+        >
+          <div
+            class="MuiCardContent-root"
+          >
+            <div
+              class="MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2"
+            >
+              <div
+                class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-2"
+              >
+                <div
+                  class="sc-gsTCUz ibifZU"
+                  data-testid="job-id-1"
+                >
+                  1
+                </div>
+              </div>
+              <div
+                class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-10"
+              >
+                <div
+                  class="sc-dlfnbm qkDpN"
+                  data-testid="job-title-1"
+                >
+                  Importação de arquivos de fundos
+                </div>
+                <div>
+                  <span
+                    class="sc-hKgILt gShUbL"
+                  >
+                    Data máxima de conclusão:
+                     
+                    <span
+                      data-testid="job-max-execution-date-1"
+                    >
+                      03/02/2021 10:20
+                    </span>
+                  </span>
+                </div>
+                <div>
+                  <span
+                    class="sc-hKgILt gShUbL"
+                    data-testid="job-estimated-time-1"
+                  >
+                    Tempo estimado (Hora): 
+                    6
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>,
+  "container": <div>
+    <div
+      class="sc-bdfBwQ ijWURA"
+    >
+      <div
+        class="MuiPaper-root MuiCard-root MuiPaper-elevation2 MuiPaper-rounded"
+      >
+        <div
+          class="MuiCardContent-root"
+        >
+          <div
+            class="MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2"
+          >
+            <div
+              class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-2"
+            >
+              <div
+                class="sc-gsTCUz ibifZU"
+                data-testid="job-id-1"
+              >
+                1
+              </div>
+            </div>
+            <div
+              class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-10"
+            >
+              <div
+                class="sc-dlfnbm qkDpN"
+                data-testid="job-title-1"
+              >
+                Importação de arquivos de fundos
+              </div>
+              <div>
+                <span
+                  class="sc-hKgILt gShUbL"
+                >
+                  Data máxima de conclusão:
+                   
+                  <span
+                    data-testid="job-max-execution-date-1"
+                  >
+                    03/02/2021 10:20
+                  </span>
+                </span>
+              </div>
+              <div>
+                <span
+                  class="sc-hKgILt gShUbL"
+                  data-testid="job-estimated-time-1"
+                >
+                  Tempo estimado (Hora): 
+                  6
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;
