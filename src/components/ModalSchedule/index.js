@@ -32,7 +32,7 @@ function ModalSchedule({ open, value, onCancel, onSave }) {
   } = useFormSchedule(value);
 
   const [openModalJob, setOpenModalJob] = useState(false);
-  const [job, setJob] = useState();
+  const [jobSelected, setJobSelected] = useState();
 
   useEffect(() => {
     if (!open) {
@@ -55,12 +55,12 @@ function ModalSchedule({ open, value, onCancel, onSave }) {
   }, [form, onSave, validateBeforeSave]);
 
   const handleAddJob = useCallback(() => {
-    setJob();
+    setJobSelected();
     setOpenModalJob(true);
   }, []);
 
   const handleClickJob = useCallback((v) => {
-    setJob(v);
+    setJobSelected(v);
     setOpenModalJob(true);
   }, []);
 
@@ -68,14 +68,14 @@ function ModalSchedule({ open, value, onCancel, onSave }) {
     <>
       <ModalJob
         open={openModalJob}
-        value={job}
+        value={jobSelected}
         onCancel={() => {
           setOpenModalJob(false);
-          setJob();
+          setJobSelected();
         }}
         onSave={(jobSave) => {
           setOpenModalJob(false);
-          setJob();
+          setJobSelected();
           handleSaveJobs(jobSave);
         }}
       />
