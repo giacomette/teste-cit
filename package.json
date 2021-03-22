@@ -43,6 +43,11 @@
     ]
   },
   "devDependencies": {
+    "@babel/preset-react": "^7.12.13",
+    "@stryker-mutator/core": "^4.5.1",
+    "@stryker-mutator/html-reporter": "^3.1.0",
+    "@stryker-mutator/javascript-mutator": "^4.0.0",
+    "@stryker-mutator/jest-runner": "^4.5.1",
     "@testing-library/react-hooks": "^5.1.0",
     "node-sass": "^5.0.0"
   }
