@@ -1,228 +1,306 @@
 import {
-  addSchedule,
-  executeJobs,
-  executeJob,
-  findAllSchedules,
-  clearAllSchedules,
+  schedule,
+  sumEstimatedJobs,
+  sortedJobsByDate,
+  checkValidJob,
+  checkExceedEstimatedJob,
+  checkAvailabilityStartJob,
 } from "../job";
 
-describe("#job", () => {
-  beforeEach(() => {
-    clearAllSchedules();
+describe("jobs", () => {
+  test("Deve retornar verdadeiro caso o job exceda 8 horas", () => {
+    const result = checkExceedEstimatedJob(9);
+
+    expect(result).toBe(true);
   });
 
-  test("Deve adicionar um agendamento de jobs", () => {
-    const mockSchedule = {
-      id: 1,
-      jobs: [
-        {
-          id: 1,
-          descricao: "Importação de arquivos de fundos",
-          dataMaximaExecucao: "2019-11-10 12:00:00",
-          tempoEstimado: 2,
-        },
-        {
-          id: 2,
-          descricao: "Importação de dados da Base Legada",
-          dataMaximaExecucao: "2019-11-11 18:00:00",
-          tempoEstimado: 4,
-        },
-      ],
-    };
+  test("Deve retornar falso caso o job não exceda 8 horas", () => {
+    const result = checkExceedEstimatedJob(6);
 
-    const result = addSchedule(mockSchedule);
-
-    expect(result).not.toBeNull();
+    expect(result).toBe(false);
   });
 
-  test("Não deve adicionar um agendamento caso não seja informado nenhum job", () => {
-    const mockSchedule = {
-      id: 1,
-      jobs: [],
-    };
+  test("Deve iniciar um job caso a data de inicio seja maior ou igual a data disponivel na lista de execução atual", () => {
+    const mockJobStartDate = "2020-02-02 12:00:00";
+    const mockBatchNextStartDate = "2020-02-02 11:00:00";
 
-    const result = addSchedule(mockSchedule);
+    const result = checkAvailabilityStartJob(
+      mockJobStartDate,
+      mockBatchNextStartDate
+    );
 
-    expect(result).toBeNull();
+    expect(result).toBe(true);
   });
 
-  test("Deve retornar todos os agendamentos criados", () => {
-    const mockSchedule1 = {
-      id: 1,
-      jobs: [
-        {
-          id: 1,
-          descricao: "Importação de arquivos de fundos",
-          dataMaximaExecucao: "2019-11-10 12:00:00",
-          tempoEstimado: 2,
-        },
-      ],
-    };
+  test("Não deve iniciar um job caso tenha job em andamento", () => {
+    const mockJobStartDate = "2020-02-02 10:00:00";
+    const mockBatchNextStartDate = "2020-02-02 11:00:00";
 
-    const mockSchedule2 = {
-      jobs: [
-        {
-          descricao: "Importação de dados da Base Legada",
-          dataMaximaExecucao: "2019-11-11 18:00:00",
-          tempoEstimado: 4,
-        },
-      ],
-    };
+    const result = checkAvailabilityStartJob(
+      mockJobStartDate,
+      mockBatchNextStartDate
+    );
 
-    addSchedule(mockSchedule1);
-
-    addSchedule(mockSchedule2);
-
-    const result = findAllSchedules();
-
-    expect(result).toHaveLength(2);
+    expect(result).toBe(false);
   });
 
-  test("Não deve retornar agendamentos caso não tenha nenhum criado", () => {
-    const mockSchedule1 = {
-      jobs: [],
-    };
-
-    const mockSchedule2 = {
-      jobs: [],
-    };
-
-    addSchedule(mockSchedule1);
-
-    addSchedule(mockSchedule2);
-
-    const result = findAllSchedules();
-
-    expect(result).toHaveLength(0);
-  });
-
-  test("Deve executar um job que esteja dentro da janela de execução e com tempo estimado menor ou igual a 8", async () => {
-    const now = new Date().getTime();
-
-    const mockMinDate = new Date(now - 100000);
-    const mockMaxDate = new Date(now + 900000);
-
-    const mockJobExecuteDate = new Date(now);
-
-    const mockJob = {
-      id: 1,
-      descricao: "Importação de dados da Base Legada",
-      dataMaximaExecucao: mockJobExecuteDate.toISOString(),
-      tempoEstimado: 8,
-    };
-
-    const result = await executeJob(mockJob, mockMinDate, mockMaxDate);
-
-    expect(result.success).toBe(true);
-    expect(result.id).toBe(mockJob.id);
-  });
-
-  test("Não deve executar um job caso a data de execução tiver antes da janela de execução", async () => {
-    const now = new Date().getTime();
-
-    const mockMinDate = new Date(now - 100000);
-    const mockMaxDate = new Date(now + 900000);
-
-    const mockJob = {
-      id: 1,
-      descricao: "Importação de dados da Base Legada",
-      dataMaximaExecucao: "2020-02-10 10:00:00",
-      tempoEstimado: 6,
-    };
-
-    const result = await executeJob(mockJob, mockMinDate, mockMaxDate);
-
-    expect(result.success).toBe(false);
-    expect(result.id).toBe(mockJob.id);
-  });
-
-  test("Não deve executar um job caso a data de execução tiver depois da janela de execução", async () => {
-    const now = new Date().getTime();
-
-    const mockMinDate = new Date(now - 100000);
-    const mockMaxDate = new Date(now + 900000);
-
-    const mockJobExecuteDate = new Date(now + 1000000);
-
-    const mockJob = {
-      id: 1,
-      descricao: "Importação de dados da Base Legada",
-      dataMaximaExecucao: mockJobExecuteDate.toISOString(),
-      tempoEstimado: 6,
-    };
-
-    const result = await executeJob(mockJob, mockMinDate, mockMaxDate);
-
-    expect(result.success).toBe(false);
-    expect(result.id).toBe(mockJob.id);
-  });
-
-  test("Não deve executar um job caso o tempo estimado for maior que 8", async () => {
-    const now = new Date().getTime();
-
-    const mockMinDate = new Date(now - 100000);
-    const mockMaxDate = new Date(now + 900000);
-
-    const mockJobExecuteDate = new Date(now);
-
-    const mockJob = {
-      id: 1,
-      descricao: "Importação de dados da Base Legada",
-      dataMaximaExecucao: mockJobExecuteDate.toISOString(),
-      tempoEstimado: 9,
-    };
-
-    const result = await executeJob(mockJob, mockMinDate, mockMaxDate);
-
-    expect(result.success).toBe(false);
-    expect(result.id).toBe(mockJob.id);
-  });
-
-  test("Deve executar os jobs de um agendamento e retornar 1 com sucesso e 2 com erro", async () => {
-    const now = new Date().getTime();
-
-    const mockMinDate = new Date(now - 100000);
-    const mockMaxDate = new Date(now + 900000);
-
-    const mockJobExecuteDate = new Date(now);
-
-    const mockSchedule = {
-      id: 1,
-      dataInicio: mockMinDate.toISOString(),
-      dataFim: mockMaxDate.toISOString(),
-      jobs: [
-        {
-          id: 1,
-          descricao: "Importação de arquivos de fundos",
-          dataMaximaExecucao: "2020-11-10 12:00:00",
-          tempoEstimado: 2,
-        },
-        {
-          id: 2,
-          descricao: "Importação de dados da Base Legada",
-          dataMaximaExecucao: mockJobExecuteDate.toISOString(),
-          tempoEstimado: 6,
-        },
-        {
-          id: 3,
-          descricao: "Importação de dados de integração",
-          dataMaximaExecucao: "2019-11-11 08:00:00",
-          tempoEstimado: 4,
-        },
-      ],
-    };
-
-    addSchedule(mockSchedule);
-
-    const [result] = findAllSchedules();
-
-    const resultJobs = await executeJobs(result);
-
-    const expected = [
-      [2], // jobs que deram certo
-      [1, 3], // jobs que ultrapassaram a data de execucao
+  test("Deve retornar os jobs ordenados ascendente pela data máxima de execução", () => {
+    const mockJobs = [
+      {
+        id: 1,
+        description: "Importação de arquivos de fundos",
+        maxExecutionDate: "2021-02-03 10:20:00",
+        estimatedTime: 6,
+      },
+      {
+        id: 2,
+        description: "Importação de dados da Base Legada",
+        maxExecutionDate: "2021-02-03 04:00:00",
+        estimatedTime: 4,
+      },
+      {
+        id: 3,
+        description: "Importação de dados de integração",
+        maxExecutionDate: "2021-02-03 12:30:00",
+        estimatedTime: 6,
+      },
     ];
 
-    expect(resultJobs).toEqual(expected);
+    const expected = [
+      {
+        id: 2,
+        description: "Importação de dados da Base Legada",
+        maxExecutionDate: "2021-02-03 04:00:00",
+        estimatedTime: 4,
+      },
+      {
+        id: 1,
+        description: "Importação de arquivos de fundos",
+        maxExecutionDate: "2021-02-03 10:20:00",
+        estimatedTime: 6,
+      },
+      {
+        id: 3,
+        description: "Importação de dados de integração",
+        maxExecutionDate: "2021-02-03 12:30:00",
+        estimatedTime: 6,
+      },
+    ];
+
+    const result = sortedJobsByDate(mockJobs);
+
+    expect(result).toEqual(expected);
+  });
+
+  test("Deve somar o tempo total estimado de uma lista de jobs", () => {
+    const mockJobs = [
+      {
+        id: 1,
+        description: "Importação de arquivos de fundos",
+        maxExecutionDate: "2021-02-03 10:20:00",
+        estimatedTime: 6,
+      },
+      {
+        id: 2,
+        description: "Importação de dados da Base Legada",
+        maxExecutionDate: "2021-02-03 04:00:00",
+        estimatedTime: 4,
+      },
+      {
+        id: 3,
+        description: "Importação de dados de integração",
+        maxExecutionDate: "2021-02-03 12:30:00",
+        estimatedTime: 6,
+      },
+    ];
+
+    const result = sumEstimatedJobs(mockJobs);
+
+    expect(result).toEqual(16);
+  });
+
+  test("Deve criar uma lista de execução de jobs dentro de uma janela com inicio e fim", () => {
+    const mockJobs = [
+      {
+        id: 1,
+        description: "Importação de arquivos de fundos",
+        maxExecutionDate: "2021-02-02 14:20:00",
+        estimatedTime: 6,
+      },
+      {
+        id: 2,
+        description: "Importação de dados da Base Legada",
+        maxExecutionDate: "2021-02-02 18:00:00",
+        estimatedTime: 2,
+      },
+      {
+        id: 3,
+        description: "Importação de dados de integração",
+        maxExecutionDate: "2021-02-02 12:30:00",
+        estimatedTime: 6,
+      },
+    ];
+
+    const mockStartDate = "2021-02-02 08:00:00";
+    const mockEndDate = "2021-02-02 20:00:00";
+
+    const expected = [[1, 2]];
+
+    const result = schedule(mockJobs, mockStartDate, mockEndDate);
+
+    expect(result).toEqual(expected);
+  });
+
+  test("Deve criar uma janela de execução com duas listas de jobs que não ultrapassem 8 horas de execução e obedeçam a data de inicio e fim da janela", () => {
+    const mockJobs = [
+      {
+        id: 1,
+        description: "Importação de arquivos de fundos",
+        maxExecutionDate: "2019-11-10 12:00:00",
+        estimatedTime: 2,
+      },
+      {
+        id: 2,
+        description: "Importação de dados da Base Legada",
+        maxExecutionDate: "2019-11-11 12:00:00",
+        estimatedTime: 4,
+      },
+      {
+        id: 3,
+        description: "Importação de dados de integração",
+        maxExecutionDate: "2019-11-11 08:00:00",
+        estimatedTime: 6,
+      },
+      {
+        id: 4,
+        description: "ETL do banco legado",
+        maxExecutionDate: "2019-11-11 11:00:00",
+        estimatedTime: 10,
+      },
+    ];
+
+    const mockStartDate = "2019-11-10 09:00:00";
+    const mockEndDate = "2019-11-11 12:00:00";
+
+    const expected = [[1, 3], [2]];
+
+    const result = schedule(mockJobs, mockStartDate, mockEndDate);
+
+    expect(result).toEqual(expected);
+  });
+
+  test("Não deve criar uma janela de execução com jobs que ultrapassem 8 horas de execução", () => {
+    const mockJobs = [
+      {
+        id: 1,
+        description: "Importação de arquivos de fundos",
+        maxExecutionDate: "2019-11-10 12:00:00",
+        estimatedTime: 12,
+      },
+      {
+        id: 2,
+        description: "Importação de dados da Base Legada",
+        maxExecutionDate: "2019-11-11 12:00:00",
+        estimatedTime: 24,
+      },
+    ];
+
+    const mockStartDate = "2019-11-10 09:00:00";
+    const mockEndDate = "2019-11-11 12:00:00";
+
+    const expected = [];
+
+    const result = schedule(mockJobs, mockStartDate, mockEndDate);
+
+    expect(result).toEqual(expected);
+  });
+
+  test("Não deve adicionar jobs na janela de execução caso ultrapassem a data final da janela de execução", () => {
+    const mockJobs = [
+      {
+        id: 1,
+        description: "Importação de arquivos de fundos",
+        maxExecutionDate: "2019-11-11 12:00:00",
+        estimatedTime: 5,
+      },
+      {
+        id: 2,
+        description: "Importação de dados da Base Legada",
+        maxExecutionDate: "2019-11-11 12:00:00",
+        estimatedTime: 6,
+      },
+    ];
+
+    const mockStartDate = "2019-11-11 00:00:00";
+    const mockEndDate = "2019-11-11 04:00:00";
+
+    const expected = [];
+
+    const result = schedule(mockJobs, mockStartDate, mockEndDate);
+
+    expect(result).toEqual(expected);
+  });
+
+  test("Não deve conter jobs que iniciem antes do anterior finalizar", () => {
+    const mockJobs = [
+      {
+        id: 1,
+        description: "Importação de arquivos de fundos",
+        maxExecutionDate: "2019-11-11 03:00:00",
+        estimatedTime: 3,
+      },
+      {
+        id: 2,
+        description: "Importação de dados da Base Legada",
+        maxExecutionDate: "2019-11-11 04:00:00",
+        estimatedTime: 2,
+      },
+    ];
+
+    const mockStartDate = "2019-11-11 00:00:00";
+    const mockEndDate = "2019-11-11 04:00:00";
+
+    const expected = [[1]];
+
+    const result = schedule(mockJobs, mockStartDate, mockEndDate);
+
+    expect(result).toEqual(expected);
+  });
+
+  test("Não deve retornar jobs que ultrapassem 8 ou tenha data maxima anterior a data de inicio da janela", () => {
+    const mockJob1 = {
+      id: 1,
+      description: "Importação de arquivos de fundos",
+      maxExecutionDate: "2019-11-10 23:00:00",
+      estimatedTime: 3,
+    };
+
+    const mockJob2 = {
+      id: 2,
+      description: "Importação de dados da Base Legada",
+      maxExecutionDate: "2019-11-11 04:00:00",
+      estimatedTime: 10,
+    };
+
+    const mockStartDate = "2019-11-11 00:00:00";
+    const mockEndDate = "2019-11-11 04:00:00";
+
+    const resultValidadedMaxExecutionDate = checkValidJob(
+      mockJob1.maxExecutionDate,
+      mockJob1.estimatedTime,
+      mockStartDate,
+      mockEndDate
+    );
+
+    expect(resultValidadedMaxExecutionDate).toBe(false);
+
+    const resultValidadedMaxExecutionTime = checkValidJob(
+      mockJob2.maxExecutionDate,
+      mockJob2.estimatedTime,
+      mockStartDate,
+      mockEndDate
+    );
+
+    expect(resultValidadedMaxExecutionTime).toBe(false);
   });
 });
